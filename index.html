@@ -70,6 +70,29 @@
         #armorRight {
             text-align: right;
         }
+
+        #weaponDisplay {
+            position: absolute;
+            right: 40px;
+            top: 40px;
+            font-family: 'Courier New', monospace;
+            color: #0f0;
+            text-shadow: 0 0 10px #0f0;
+            pointer-events: none;
+            text-align: right;
+        }
+
+        .weapon-item {
+            font-size: 16px;
+            margin-bottom: 8px;
+            opacity: 0.6;
+        }
+
+        .weapon-item.active {
+            opacity: 1.0;
+            font-size: 20px;
+            font-weight: bold;
+        }
     </style>
 </head>
 <body>
@@ -90,14 +113,21 @@
         </div>
     </div>
 
-    <!-- Cannon-es for physics -->
-    <script src="https://cdn.jsdelivr.net/npm/cannon-es@0.20.0/dist/cannon-es.js"></script>
+    <div id="weaponDisplay">
+        <div class="weapon-item active" id="weapon0">[ MACHINEGUN ]</div>
+        <div class="weapon-item" id="weapon1">SHOTGUN</div>
+    </div>
+
     <!-- Three.js for rendering -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <!-- Cannon-es for physics -->
+    <script src="https://cdn.jsdelivr.net/npm/cannon-es@0.20.0/dist/cannon-es.js"></script>
 
     <!-- Engine Core -->
     <script src="js/core/engine.js"></script>
     <script src="js/core/input.js"></script>
+    <script src="js/core/physics.js"></script>
+    <script src="js/core/renderer.js"></script>
 
     <!-- Player Systems -->
     <script src="js/player/player.js"></script>
