@@ -1,54 +1,100 @@
 window.FPSGame = window.FPSGame || {};
 
 (() => {
-  class Player {
-    constructor({ x = 0, y = 1.7, z = 0 } = {}) {
-      this.position = { x, y, z };
-      this.velocity = { x: 0, y: 0, z: 0 };
-      this.rotation = { yaw: 0, pitch: 0 };
-      this.health = 100;
-      this.armor = 0;
-      this.speed = 5.5;
-      this.jumpForce = 7.5;
-      this.onGround = true;
-      this.facing = { x: 0, z: 1 };
+  class InputHandler {
+    constructor() {
+      this.keys = new Set();
+      this.mouse = {
+        x: 0,
+        y: 0,
+        down: false,
+        deltaX: 0,
+        deltaY: 0,
+        button: null,
+        locked: false
+      };
+
+      this.bindEvents();
     }
 
-    update(input, delta) {
-      const forward = Number(input.isDown('KeyW')) - Number(input.isDown('KeyS'));
-      const strafe = Number(input.isDown('KeyD')) - Number(input.isDown('KeyA'));
+    bindEvents() {
+      window.addEventListener('keydown', (event) => {
+        this.keys.add(event.code);
 
-      if (forward !== 0 || strafe !== 0) {
-        const moveX = Math.sin(this.rotation.yaw) * strafe + Math.cos(this.rotation.yaw) * forward;
-        const moveZ = Math.cos(this.rotation.yaw) * strafe - Math.sin(this.rotation.yaw) * forward;
+        if (event.code === 'Digit1') {
+          this.emitWeaponSwitch(0);
+        }
 
-        this.velocity.x = moveX * this.speed;
-        this.velocity.z = moveZ * this.speed;
-      } else {
-        this.velocity.x *= 0.8;
-        this.velocity.z *= 0.8;
-      }
+        if (event.code === 'Digit2') {
+          this.emitWeaponSwitch(1);
+        }
+      });
 
-      if (input.isDown('Space') && this.onGround) {
-        this.velocity.y = this.jumpForce;
-        this.onGround = false;
-      }
+      window.addEventListener('keyup', (event) => {
+        this.keys.delete(event.code);
+      });
 
-      this.position.x += this.velocity.x * delta;
-      this.position.z += this.velocity.z * delta;
-      this.position.y += this.velocity.y * delta;
+      window.addEventListener('mousemove', (event) => {
+        if (!this.mouse.locked) return;
+        this.mouse.deltaX += event.movementX || 0;
+        this.mouse.deltaY += event.movementY || 0;
+        this.mouse.x = event.clientX;
+        this.mouse.y = event.clientY;
+      });
 
-      this.velocity.y -= 18 * delta;
-      if (this.position.y <= 1.7) {
-        this.position.y = 1.7;
-        this.velocity.y = 0;
-        this.onGround = true;
-      }
+      window.addEventListener('mousedown', (event) => {
+        this.mouse.down = true;
+        this.mouse.button = event.button;
+      });
 
-      this.facing.x = Math.sin(this.rotation.yaw);
-      this.facing.z = Math.cos(this.rotation.yaw);
+      window.addEventListener('mouseup', (event) => {
+        this.mouse.down = false;
+        this.mouse.button = null;
+      });
+
+      window.addEventListener('contextmenu', (event) => {
+        event.preventDefault();
+      });
+
+      document.addEventListener('pointerlockchange', () => {
+        this.mouse.locked = document.pointerLockElement !== null;
+      });
+
+      window.addEventListener('click', () => {
+        const canvas = document.getElementById('gameCanvas');
+        if (canvas && document.pointerLockElement !== canvas) {
+          canvas.requestPointerLock();
+        }
+      });
+    }
+
+    emitWeaponSwitch(index) {
+      const event = new CustomEvent('weapon-switch', { detail: { index } });
+      window.dispatchEvent(event);
+    }
+
+    isDown(code) {
+      return this.keys.has(code);
+    }
+
+    consumeMouseDelta() {
+      const delta = {
+        x: this.mouse.deltaX,
+        y: this.mouse.deltaY
+      };
+      this.mouse.deltaX = 0;
+      this.mouse.deltaY = 0;
+      return delta;
+    }
+
+    reset() {
+      this.keys.clear();
+      this.mouse.down = false;
+      this.mouse.button = null;
+      this.mouse.deltaX = 0;
+      this.mouse.deltaY = 0;
     }
   }
 
-  window.FPSGame.Player = Player;
+  window.FPSGame.Input = InputHandler;
 })();

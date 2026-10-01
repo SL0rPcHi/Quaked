@@ -1,77 +1,64 @@
 window.FPSGame = window.FPSGame || {};
 
 (() => {
-  const canvas = document.getElementById('gameCanvas');
-  const engine = new window.FPSGame.Engine(canvas);
-  const input = new window.FPSGame.Input();
-  const player = new window.FPSGame.Player({ x: 0, y: 1.7, z: 0 });
-  const movement = new window.FPSGame.MovementController(player);
-  const cameraController = new window.FPSGame.CameraController(player);
-  const world = new window.FPSGame.World();
-  const weaponSystem = new window.FPSGame.WeaponSystem();
+  class Weapon {
+    constructor({
+      name = 'Weapon',
+      ammoPool = 200,
+      damage = 20,
+      fireRate = 0.08,
+      spread = 0.02,
+      pellets = 1,
+      costPerShot = 1,
+      minDamage = 12,
+      damageFalloff = 0.7
+    } = {}) {
+      this.name = name;
+      this.ammoPool = ammoPool;
+      this.damage = damage;
+      this.minDamage = minDamage;
+      this.damageFalloff = damageFalloff;
+      this.fireRate = fireRate;
+      this.spread = spread;
+      this.pellets = pellets;
+      this.costPerShot = costPerShot;
+      this.cooldown = 0;
+    }
 
-  const rifle = new window.FPSGame.Weapon({
-    name: 'Rifle',
-    damage: 35,
-    fireRate: 0.1,
-    ammoPerClip: 30,
-    reserveAmmo: 90,
-    spread: 0.03
+    update(delta) {
+      this.cooldown = Math.max(0, this.cooldown - delta);
+    }
+
+    getDisplayName() {
+      return this.name.toUpperCase();
+    }
+  }
+
+  const machineGun = new Weapon({
+    name: 'Machinegun',
+    ammoPool: 200,
+    damage: 18,
+    fireRate: 0.08,
+    spread: 0.025,
+    pellets: 1,
+    costPerShot: 1,
+    minDamage: 10,
+    damageFalloff: 0.8
   });
 
-  weaponSystem.register(rifle);
-
-  engine.on('update', ({ delta, elapsed, fps }) => {
-    const mouseDelta = input.consumeMouseDelta();
-    if (mouseDelta.x || mouseDelta.y) {
-      player.rotation.yaw -= mouseDelta.x * 0.0022;
-      player.rotation.pitch -= mouseDelta.y * 0.0018;
-    }
-
-    if (input.isDown('KeyW') || input.isDown('KeyA') || input.isDown('KeyS') || input.isDown('KeyD')) {
-      movement.update(input, delta);
-    } else {
-      player.velocity.x *= 0.8;
-      player.velocity.z *= 0.8;
-    }
-
-    if (input.isDown('Space') && player.onGround) {
-      player.velocity.y = player.jumpForce;
-      player.onGround = false;
-    }
-
-    player.position.y += player.velocity.y * delta;
-    player.velocity.y -= 18 * delta;
-
-    if (player.position.y <= 1.7) {
-      player.position.y = 1.7;
-      player.velocity.y = 0;
-      player.onGround = true;
-    }
-
-    if (input.mouse.down) {
-      weaponSystem.fire();
-    }
-
-    rifle.update(delta);
-
-    const ammoValue = document.getElementById('ammoValue');
-    const healthValue = document.getElementById('healthValue');
-    const armorValue = document.getElementById('armorValue');
-
-    if (ammoValue) ammoValue.textContent = String(rifle.ammoInClip);
-    if (healthValue) healthValue.textContent = String(Math.max(0, Math.round(player.health)));
-    if (armorValue) armorValue.textContent = String(Math.max(0, Math.round(player.armor)));
+  const shotgun = new Weapon({
+    name: 'Shotgun',
+    ammoPool: 50,
+    damage: 42,
+    fireRate: 0.52,
+    spread: 0.12,
+    pellets: 11,
+    costPerShot: 2,
+    minDamage: 18,
+    damageFalloff: 0.5
   });
 
-  engine.on('render', ({ ctx, width, height }) => {
-    ctx.fillStyle = '#0a0d10';
-    ctx.fillRect(0, 0, width, height);
-    ctx.fillStyle = '#1c1d1f';
-    ctx.fillRect(0, height * 0.6, width, height * 0.4);
-    ctx.fillStyle = '#111';
-    ctx.fillRect(0, 0, width, height * 0.2);
-  });
-
-  engine.start();
+  window.FPSGame.Weapon = Weapon;
+  window.FPSGame.machineGun = machineGun;
+  window.FPSGame.shotgun = shotgun;
 })();

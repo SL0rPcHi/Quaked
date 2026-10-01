@@ -1,19 +1,24 @@
 window.FPSGame = window.FPSGame || {};
 
 (() => {
-  class CameraController {
+  class SlideMovementController {
     constructor(player) {
       this.player = player;
     }
 
     update(input, delta) {
-      const mouse = input.consumeMouseDelta();
-      this.player.rotation.yaw -= mouse.x * 0.0022;
-      this.player.rotation.pitch -= mouse.y * 0.0018;
+      const friction = 0.82;
 
-      this.player.rotation.pitch = Math.max(-1.4, Math.min(1.4, this.player.rotation.pitch));
+      this.player.velocity.x *= friction;
+      this.player.velocity.z *= friction;
+
+      if (Math.abs(this.player.velocity.x) < 0.02) this.player.velocity.x = 0;
+      if (Math.abs(this.player.velocity.z) < 0.02) this.player.velocity.z = 0;
+
+      this.player.position.x += this.player.velocity.x * delta;
+      this.player.position.z += this.player.velocity.z * delta;
     }
   }
 
-  window.FPSGame.CameraController = CameraController;
+  window.FPSGame.SlideMovementController = SlideMovementController;
 })();

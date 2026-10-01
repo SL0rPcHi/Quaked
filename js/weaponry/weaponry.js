@@ -1,43 +1,28 @@
 window.FPSGame = window.FPSGame || {};
 
 (() => {
-  class WeaponSystem {
-    constructor() {
-      this.weapons = [];
-      this.currentWeaponIndex = 0;
-      this.ammo = {
-        pistol: 60,
-        rifle: 90,
-        shotgun: 20
-      };
+  class CameraController {
+    constructor(player, camera) {
+      this.player = player;
+      this.camera = camera;
     }
 
-    register(weapon) {
-      this.weapons.push(weapon);
-    }
+    update(input) {
+      const mouse = input.consumeMouseDelta();
+      this.player.rotation.yaw -= mouse.x * 0.0022;
+      this.player.rotation.pitch -= mouse.y * 0.0018;
+      this.player.rotation.pitch = Math.max(-1.4, Math.min(1.4, this.player.rotation.pitch));
 
-    setWeapon(index) {
-      if (index < 0 || index >= this.weapons.length) return;
-      this.currentWeaponIndex = index;
-    }
-
-    currentWeapon() {
-      return this.weapons[this.currentWeaponIndex] || null;
-    }
-
-    fire() {
-      const weapon = this.currentWeapon();
-      if (!weapon) return false;
-      if (weapon.ammoInClip <= 0) return false;
-
-      weapon.ammoInClip -= 1;
-      return true;
-    }
-
-    switchNext() {
-      this.setWeapon((this.currentWeaponIndex + 1) % this.weapons.length);
+      this.camera.rotation.order = 'YXZ';
+      this.camera.rotation.y = this.player.rotation.yaw;
+      this.camera.rotation.x = this.player.rotation.pitch;
+      this.camera.position.set(
+        this.player.position.x,
+        this.player.position.y,
+        this.player.position.z
+      );
     }
   }
 
-  window.FPSGame.WeaponSystem = WeaponSystem;
+  window.FPSGame.CameraController = CameraController;
 })();

@@ -1,32 +1,24 @@
 window.FPSGame = window.FPSGame || {};
 
 (() => {
-  class MovementController {
-    constructor(player) {
-      this.player = player;
+  class Player {
+    constructor({ x = 0, y = 1.7, z = 0 } = {}) {
+      this.position = { x, y, z };
+      this.velocity = { x: 0, y: 0, z: 0 };
+      this.rotation = { yaw: 0, pitch: 0 };
+      this.health = 100;
+      this.armor = 0;
+      this.speed = 7.5;
+      this.jumpForce = 7.5;
+      this.onGround = true;
+      this.facing = { x: 0, z: 1 };
     }
 
-    update(input, delta) {
-      const forward = Number(input.isDown('KeyW')) - Number(input.isDown('KeyS'));
-      const strafe = Number(input.isDown('KeyD')) - Number(input.isDown('KeyA'));
-      const speedMultiplier = input.isDown('ShiftLeft') ? 1.5 : 1;
-
-      const yaw = this.player.rotation.yaw;
-      const moveX = Math.sin(yaw) * strafe + Math.cos(yaw) * forward;
-      const moveZ = Math.cos(yaw) * strafe - Math.sin(yaw) * forward;
-
-      this.player.velocity.x = moveX * this.player.speed * speedMultiplier;
-      this.player.velocity.z = moveZ * this.player.speed * speedMultiplier;
-
-      if (forward === 0 && strafe === 0) {
-        this.player.velocity.x *= 0.7;
-        this.player.velocity.z *= 0.7;
-      }
-
-      this.player.position.x += this.player.velocity.x * delta;
-      this.player.position.z += this.player.velocity.z * delta;
+    updateFacing() {
+      this.facing.x = Math.sin(this.rotation.yaw);
+      this.facing.z = Math.cos(this.rotation.yaw);
     }
   }
 
-  window.FPSGame.MovementController = MovementController;
+  window.FPSGame.Player = Player;
 })();

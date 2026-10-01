@@ -1,29 +1,34 @@
 window.FPSGame = window.FPSGame || {};
 
 (() => {
-  class SlideMovementController {
+  class MovementController {
     constructor(player) {
       this.player = player;
-      this.slideVelocity = { x: 0, z: 0 };
     }
 
     update(input, delta) {
-      const slideStrength = 0.8;
+      const forward = Number(input.isDown('KeyW')) - Number(input.isDown('KeyS'));
+      const strafe = Number(input.isDown('KeyD')) - Number(input.isDown('KeyA'));
+      const sprint = input.isDown('ShiftLeft') ? 1.35 : 1;
 
-      this.player.velocity.x *= slideStrength;
-      this.player.velocity.z *= slideStrength;
+      const moveX = Math.sin(this.player.rotation.yaw) * strafe + Math.cos(this.player.rotation.yaw) * forward;
+      const moveZ = Math.cos(this.player.rotation.yaw) * strafe - Math.sin(this.player.rotation.yaw) * forward;
 
-      if (Math.abs(this.player.velocity.x) < 0.05) {
-        this.player.velocity.x = 0;
-      }
-      if (Math.abs(this.player.velocity.z) < 0.05) {
-        this.player.velocity.z = 0;
+      const currentSpeed = this.player.speed * sprint;
+
+      this.player.velocity.x = moveX * currentSpeed;
+      this.player.velocity.z = moveZ * currentSpeed;
+
+      if (forward === 0 && strafe === 0) {
+        this.player.velocity.x *= 0.75;
+        this.player.velocity.z *= 0.75;
       }
 
       this.player.position.x += this.player.velocity.x * delta;
       this.player.position.z += this.player.velocity.z * delta;
+      this.player.updateFacing();
     }
   }
 
-  window.FPSGame.SlideMovementController = SlideMovementController;
+  window.FPSGame.MovementController = MovementController;
 })();
