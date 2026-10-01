@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quake 3 FPS</title>
+    <title>Quaked</title>
     <style>
         * {
             margin: 0;
@@ -16,6 +16,7 @@
             height: 100vh;
             overflow: hidden;
             background: #000;
+            font-family: 'Courier New', monospace;
         }
 
         canvas {
@@ -27,17 +28,14 @@
         #hud {
             position: absolute;
             bottom: 40px;
-            width: 100%;
-            height: 80px;
+            left: 50%;
+            transform: translateX(-50%);
             display: flex;
-            justify-content: space-between;
-            align-items: flex-end;
-            padding: 0 40px;
+            gap: 60px;
             font-family: 'Courier New', monospace;
-            font-size: 48px;
+            font-size: 36px;
             font-weight: bold;
-            color: #0f0;
-            text-shadow: 0 0 10px #0f0;
+            color: #fff;
             pointer-events: none;
         }
 
@@ -45,30 +43,21 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 8px;
+            gap: 4px;
         }
 
         .hud-label {
-            font-size: 12px;
+            font-size: 10px;
             text-transform: uppercase;
-            letter-spacing: 2px;
-            opacity: 0.7;
+            letter-spacing: 1px;
+            opacity: 0.8;
         }
 
         .hud-value {
-            font-size: 48px;
-        }
-
-        #ammoLeft {
-            text-align: left;
-        }
-
-        #healthCenter {
+            font-size: 36px;
+            font-weight: bold;
+            min-width: 60px;
             text-align: center;
-        }
-
-        #armorRight {
-            text-align: right;
         }
 
         #weaponDisplay {
@@ -76,21 +65,21 @@
             right: 40px;
             top: 40px;
             font-family: 'Courier New', monospace;
-            color: #0f0;
-            text-shadow: 0 0 10px #0f0;
+            color: #fff;
             pointer-events: none;
             text-align: right;
         }
 
         .weapon-item {
-            font-size: 16px;
-            margin-bottom: 8px;
+            font-size: 14px;
+            margin-bottom: 6px;
             opacity: 0.6;
+            letter-spacing: 0.5px;
         }
 
         .weapon-item.active {
             opacity: 1.0;
-            font-size: 20px;
+            font-size: 16px;
             font-weight: bold;
         }
     </style>
@@ -100,21 +89,21 @@
     
     <div id="hud">
         <div class="hud-element" id="ammoLeft">
-            <div class="hud-label">Ammo</div>
-            <div class="hud-value" id="ammoValue">0</div>
+            <div class="hud-label">AMMO</div>
+            <div class="hud-value" id="ammoValue">200</div>
         </div>
         <div class="hud-element" id="healthCenter">
-            <div class="hud-label">Health</div>
+            <div class="hud-label">HEALTH</div>
             <div class="hud-value" id="healthValue">100</div>
         </div>
         <div class="hud-element" id="armorRight">
-            <div class="hud-label">Armor</div>
+            <div class="hud-label">ARMOR</div>
             <div class="hud-value" id="armorValue">0</div>
         </div>
     </div>
 
     <div id="weaponDisplay">
-        <div class="weapon-item active" id="weapon0">[ MACHINEGUN ]</div>
+        <div class="weapon-item active" id="weapon0">MACHINEGUN</div>
         <div class="weapon-item" id="weapon1">SHOTGUN</div>
     </div>
 
@@ -124,30 +113,30 @@
     <script src="https://cdn.jsdelivr.net/npm/cannon-es@0.20.0/dist/cannon-es.js"></script>
 
     <!-- Engine Core -->
-    <script src="js/core/engine.js"></script>
-    <script src="js/core/input.js"></script>
-    <script src="js/core/physics.js"></script>
-    <script src="js/core/renderer.js"></script>
+    <script src="./js/core/engine.js"></script>
+    <script src="./js/core/input.js"></script>
+    <script src="./js/core/physics.js"></script>
+    <script src="./js/core/renderer.js"></script>
 
     <!-- Player Systems -->
-    <script src="js/player/player.js"></script>
-    <script src="js/player/movement.js"></script>
-    <script src="js/player/slide_movement.js"></script>
-    <script src="js/player/camera.js"></script>
+    <script src="./js/player/player.js"></script>
+    <script src="./js/player/movement.js"></script>
+    <script src="./js/player/slide_movement.js"></script>
+    <script src="./js/player/camera.js"></script>
 
     <!-- Weaponry Systems -->
-    <script src="js/weaponry/weaponry.js"></script>
-    <script src="js/weaponry/weapons.js"></script>
+    <script src="./js/weaponry/weaponry.js"></script>
+    <script src="./js/weaponry/weapons.js"></script>
 
     <!-- World -->
-    <script src="js/world/world.js"></script>
-    <script src="js/world/map.js"></script>
+    <script src="./js/world/world.js"></script>
+    <script src="./js/world/map.js"></script>
 
     <!-- Entities -->
-    <script src="js/entities/entity.js"></script>
-    <script src="js/entities/enemy.js"></script>
+    <script src="./js/entities/entity.js"></script>
+    <script src="./js/entities/enemy.js"></script>
 
     <!-- Game Loop -->
-    <script src="js/game.js"></script>
+    <script src="./js/game.js"></script>
 </body>
 </html>
