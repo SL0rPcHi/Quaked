@@ -1,63 +1,38 @@
 window.FPSGame = window.FPSGame || {};
 
 (() => {
-  class WeaponSystem {
-    constructor() {
-      this.weapons = [];
-      this.currentWeaponIndex = 0;
-      this.fireCooldown = 0;
-      this.weaponSwitchListeners = [];
-    }
-
-    register(weapon) {
-      this.weapons.push(weapon);
-    }
-
-    setWeapon(index) {
-      if (index < 0 || index >= this.weapons.length) return false;
-      this.currentWeaponIndex = index;
-      this.fireCooldown = 0;
-      this.notifyWeaponSwitch();
-      return true;
-    }
-
-    currentWeapon() {
-      return this.weapons[this.currentWeaponIndex] || null;
-    }
-
-    notifyWeaponSwitch() {
-      const weapon = this.currentWeapon();
-      for (const cb of this.weaponSwitchListeners) {
-        cb(weapon);
-      }
-    }
-
-    onWeaponSwitch(cb) {
-      this.weaponSwitchListeners.push(cb);
+  class Weapon {
+    constructor({
+      name = 'Weapon',
+      ammoPool = 200,
+      damage = 20,
+      fireRate = 0.08,
+      spread = 0.02,
+      pellets = 1,
+      costPerShot = 1,
+      minDamage = 12,
+      damageFalloff = 0.7
+    } = {}) {
+      this.name = name;
+      this.ammoPool = ammoPool;
+      this.damage = damage;
+      this.minDamage = minDamage;
+      this.damageFalloff = damageFalloff;
+      this.fireRate = fireRate;
+      this.spread = spread;
+      this.pellets = pellets;
+      this.costPerShot = costPerShot;
+      this.cooldown = 0;
     }
 
     update(delta) {
-      this.fireCooldown = Math.max(0, this.fireCooldown - delta);
-      for (const weapon of this.weapons) {
-        weapon.update(delta);
-      }
+      this.cooldown = Math.max(0, this.cooldown - delta);
     }
 
-    hasAmmo(weapon, cost = 1) {
-      return weapon.ammoPool >= cost;
-    }
-
-    fire() {
-      const weapon = this.currentWeapon();
-      if (!weapon) return null;
-      if (this.fireCooldown > 0) return null;
-      if (!this.hasAmmo(weapon, weapon.costPerShot)) return null;
-
-      weapon.ammoPool -= weapon.costPerShot;
-      this.fireCooldown = weapon.fireRate;
-      return weapon;
+    getDisplayName() {
+      return this.name.toUpperCase();
     }
   }
 
-  window.FPSGame.WeaponSystem = WeaponSystem;
+  window.FPSGame.Weapon = Weapon;
 })();

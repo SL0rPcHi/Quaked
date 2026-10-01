@@ -1,28 +1,60 @@
 window.FPSGame = window.FPSGame || {};
 
 (() => {
-  class CameraController {
-    constructor(player, camera) {
-      this.player = player;
-      this.camera = camera;
+  class WeaponSystem {
+    constructor() {
+      this.weapons = [];
+      this.currentWeaponIndex = 0;
+      this.fireCooldown = 0;
+      this.weaponSwitchListeners = [];
     }
 
-    update(input) {
-      const mouse = input.consumeMouseDelta();
-      this.player.rotation.yaw -= mouse.x * 0.0022;
-      this.player.rotation.pitch -= mouse.y * 0.0018;
-      this.player.rotation.pitch = Math.max(-1.4, Math.min(1.4, this.player.rotation.pitch));
+    register(weapon) {
+      this.weapons.push(weapon);
+    }
 
-      this.camera.rotation.order = 'YXZ';
-      this.camera.rotation.y = this.player.rotation.yaw;
-      this.camera.rotation.x = this.player.rotation.pitch;
-      this.camera.position.set(
-        this.player.position.x,
-        this.player.position.y,
-        this.player.position.z
-      );
+    setWeapon(index) {
+      if (index < 0 || index >= this.weapons.length) return false;
+      this.currentWeaponIndex = index;
+      this.fireCooldown = 0;
+      this.notifyWeaponSwitch();
+      return true;
+    }
+
+    currentWeapon() {
+      return this.weapons[this.currentWeaponIndex] || null;
+    }
+
+    notifyWeaponSwitch() {
+      const weapon = this.currentWeapon();
+      for (const cb of this.weaponSwitchListeners) {
+        cb(weapon);
+      }
+    }
+
+    onWeaponSwitch(cb) {
+      this.weaponSwitchListeners.push(cb);
+    }
+
+    update(delta) {
+      this.fireCooldown = Math.max(0, this.fireCooldown - delta);
+    }
+
+    hasAmmo(weapon, cost = 1) {
+      return weapon.ammoPool >= cost;
+    }
+
+    fire() {
+      const weapon = this.currentWeapon();
+      if (!weapon) return null;
+      if (this.fireCooldown > 0) return null;
+      if (!this.hasAmmo(weapon, weapon.costPerShot)) return null;
+
+      weapon.ammoPool -= weapon.costPerShot;
+      this.fireCooldown = weapon.fireRate;
+      return weapon;
     }
   }
 
-  window.FPSGame.CameraController = CameraController;
+  window.FPSGame.WeaponSystem = WeaponSystem;
 })();
